@@ -13,55 +13,44 @@
 <body>
 
 
-<?php
-		
-	$busqueda=$_GET["buscar"];
+<?php 
 
-	try {
+		$busqueda_sec=$_GET['seccion'];
+		$busqueda_porig=$_GET['p_orig'];
 
-	$base=new PDO('mysql:host=localhost; dbname=pruebas', 'root', '');
+         try
+        {
+            $base= new PDO('mysql:host=localhost; dbname=pruebas', 'root', '');
+            $base->setAttribute (PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
 
-	$base->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $base->exec("SET CHARACTER SET utf8");
 
-	$base->exec("SET CHARACTER SET utf8");
+            // $sql= "SELECT C, B, D, F FROM productos WHERE C=?";
 
-	$sql="SELECT A, B, C, D, E, F, G FROM PRODUCTOS WHERE A = ? ";
+            $sql= "SELECT C, B, D, F FROM productos WHERE B=:secc AND G=:porig "; //nombre al marcador
 
-	$resultado=$base->prepare($sql);
+              $resultado=$base->prepare($sql);//se almacena un objeto tipo PDOStatement
 
-	$resultado->execute(array("$busqueda"));
-	/*
-	if ($resultado==true) {
-	
-		echo "resultado encontrado";
+              $resultado->execute(array(":secc"=>$busqueda_sec,":porig"=>$busqueda_porig));
+ 
+          while($registro=$resultado->fetch(PDO::FETCH_ASSOC)){
+          
+             echo " Nombre Artículo: " . $registro['C'] . " Sección: " . $registro['B'] . " Precio:" . $registro['D'] . " Importado: " . $registro['F'] . "<br>";
 
-	} else {
-
-		echo "resultado no encontrado";
-	}*/
-
-	while($registro=$resultado->fetch(PDO::FETCH_ASSOC)) {
-
-	echo "Nombre Artículo" . $registro['A']
-	. "Sección" . $registro['B'] 
-	. "Precio" . $registro['C'] 
-	. "País de origen" . $registro['G'] 
-	. "<br>";
-
-	}
-
-	$resultado->closeCursor();
-
-	}catch(Exception $e) {
-
-	die('Error: ' . $e->GetMessage());
-
-	}finally {
-
-	$base=NULL;
-
-	}
-
+        }
+             $resultado-> closeCursor();
+ 
+             }catch(Exception $e){
+             
+               die('Error: ' . $e -> GetMessage());
+              
+             }finally{
+             
+               $base=null;
+              
+             }
+        
 
 
 ?>
